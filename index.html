@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner Online</title>
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+        }
+
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .block {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .block h2 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .block ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .block ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .block ul li:last-child {
+            border-bottom: none;
+        }
+
+        .block a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border-radius: 30px;
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
+            width: 100%;
+        }
+
+        .navbar-nav {
+            display: none; /* Remove any links in the navbar */
+        }
+
+        /* Estilo para o formulário centralizado */
+        .form-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            z-index: 1050; /* Garantir que o formulário fique sobreposto */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .form-container.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .form-container input,
+        .form-container textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+            border-radius: 30px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-container button.close-btn {
+            background-color: #dc3545;
+            margin-top: 10px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1040; /* Para ficar atrás do formulário */
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .warning-icon {
+            color: red;
+            font-size: 1.2rem;
+        }
+
+        .delete-btn {
+            color: red;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* Estilo para a mini aba de descrição */
+        .description-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 600px;
+            z-index: 1100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .description-modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .description-modal button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .description-modal .content {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Planner Online</a>
+        </div>
+    </nav>
+
+    <!-- Principal Content -->
+    <div class="container-main">
+        <div class="row">
+            <!-- Tarefas Section -->
+            <div class="col-md-6">
+                <div class="block">
+                    <h2>Tarefas</h2>
+                    <ul id="mainTaskList">
+                        <li>Nenhuma tarefa cadastrada.</li>
+                    </ul>
+                    <button id="addTaskBtn" class="btn btn-custom mt-3"><i class="fas fa-plus"></i> Adicionar Tarefa</button>
+                </div>
+            </div>
+
+            <!-- Recursos Section -->
+            <div class="col-md-6">
+                <div class="block">
+                    <h2>Recursos Úteis</h2>
+                    <ul id="mainResourceList">
+                        <li>Nenhum recurso cadastrado.</li>
+                    </ul>
+                    <button id="addResourceBtn" class="btn btn-custom mt-3"><i class="fas fa-plus"></i> Adicionar Recurso</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sobreposição de fundo -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Formulário de Tarefa -->
+    <div id="taskForm" class="form-container">
+        <h4>Adicionar Tarefa</h4>
+        <form id="taskFormContent">
+            <input type="text" id="taskTitle" placeholder="Título da tarefa" required>
+            <input type="date" id="taskDate" required>
+            <textarea id="taskDesc" placeholder="Descrição da tarefa" required></textarea>
+            <button type="submit" class="btn-custom">Salvar Tarefa</button>
+            <button type="button" class="btn-custom close-btn" id="closeTaskForm">Fechar</button>
+        </form>
+    </div>
+
+    <!-- Formulário de Recurso -->
+    <div id="resourceForm" class="form-container">
+        <h4>Adicionar Recurso</h4>
+        <form id="resourceFormContent">
+            <input type="text" id="resourceTitle" placeholder="Título do recurso" required>
+            <textarea id="resourceDesc" placeholder="Descrição do recurso" required></textarea>
+            <input type="url" id="resourceLink" placeholder="Link do recurso" required>
+            <button type="submit" class="btn-custom">Salvar Recurso</button>
+            <button type="button" class="btn-custom close-btn" id="closeResourceForm">Fechar</button>
+        </form>
+    </div>
+
+    <!-- Mini Aba de Descrição -->
+    <div id="descriptionModal" class="description-modal">
+        <h4>Descrição Completa</h4>
+        <div id="modalContent" class="content"></div>
+        <button type="button" id="closeDescriptionModal">Fechar</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const mainTaskList = document.getElementById("mainTaskList");
+            const addTaskBtn = document.getElementById("addTaskBtn");
+            const taskForm = document.getElementById("taskForm");
+            const taskFormContent = document.getElementById("taskFormContent");
+            const closeTaskForm = document.getElementById("closeTaskForm");
+            const overlay = document.getElementById("overlay");
+
+            const mainResourceList = document.getElementById("mainResourceList");
+            const addResourceBtn = document.getElementById("addResourceBtn");
+            const resourceForm = document.getElementById("resourceForm");
+            const resourceFormContent = document.getElementById("resourceFormContent");
+            const closeResourceForm = document.getElementById("closeResourceForm");
+
+            const descriptionModal = document.getElementById("descriptionModal");
+            const modalContent = document.getElementById("modalContent");
+            const closeDescriptionModal = document.getElementById("closeDescriptionModal");
+
+            let tasks = [];
+            let resources = [];
+
+            // Mostrar formulário de tarefa
+            addTaskBtn.addEventListener("click", () => {
+                taskForm.classList.add("show");
+                overlay.classList.add("show");
+            });
+
+            // Fechar formulário de tarefa
+            closeTaskForm.addEventListener("click", () => {
+                taskForm.classList.remove("show");
+                overlay.classList.remove("show");
+            });
+
+            // Submeter formulário de tarefa
+            taskFormContent.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const title = document.getElementById("taskTitle").value;
+                const date = document.getElementById("taskDate").value;
+                const desc = document.getElementById("taskDesc").value;
+                if (title && date && desc) {
+                    const task = { title, date, desc };
+                    tasks.push(task);
+                    updateTaskList();
+                }
+                taskFormContent.reset();
+                taskForm.classList.remove("show");
+                overlay.classList.remove("show");
+            });
+
+            // Atualizar lista de tarefas
+            function updateTaskList() {
+                mainTaskList.innerHTML = "";
+                tasks.forEach((task, index) => {
+                    const taskItem = `
+                        <li>
+                            <span>${task.title} - ${task.date}</span>
+                            <button class="btn btn-link task-title-btn" onclick="openDescription('${task.desc}')">Descrição</button>
+                            <span class="delete-btn" onclick="deleteTask(${index})">×</span>
+                        </li>
+                    `;
+                    mainTaskList.innerHTML += taskItem;
+                });
+            }
+
+            // Excluir tarefa
+            function deleteTask(index) {
+                tasks.splice(index, 1);
+                updateTaskList();
+            }
+
+            // Abrir mini aba de descrição
+            function openDescription(description) {
+                modalContent.innerHTML = description;
+                descriptionModal.classList.add("show");
+            }
+
+            // Fechar mini aba de descrição
+            closeDescriptionModal.addEventListener("click", () => {
+                descriptionModal.classList.remove("show");
+            });
+
+            // Adicionar Recurso
+            addResourceBtn.addEventListener("click", () => {
+                resourceForm.classList.add("show");
+                overlay.classList.add("show");
+            });
+
+            // Fechar formulário de recurso
+            closeResourceForm.addEventListener("click", () => {
+                resourceForm.classList.remove("show");
+                overlay.classList.remove("show");
+            });
+
+            // Submeter formulário de recurso
+            resourceFormContent.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const title = document.getElementById("resourceTitle").value;
+                const desc = document.getElementById("resourceDesc").value;
+                const link = document.getElementById("resourceLink").value;
+                if (title && desc && link) {
+                    const resource = { title, desc, link };
+                    resources.push(resource);
+                    updateResourceList();
+                }
+                resourceFormContent.reset();
+                resourceForm.classList.remove("show");
+                overlay.classList.remove("show");
+            });
+
+            // Atualizar lista de recursos
+            function updateResourceList() {
+                mainResourceList.innerHTML = "";
+                resources.forEach((resource, index) => {
+                    const resourceItem = `
+                        <li>
+                            <a href="${resource.link}" target="_blank"><strong>${resource.title}</strong> - ${resource.desc}</a>
+                            <span class="delete-btn" onclick="deleteResource(${index})">×</span>
+                        </li>
+                    `;
+                    mainResourceList.innerHTML += resourceItem;
+                });
+            }
+
+            // Excluir recurso
+            function deleteResource(index) {
+                resources.splice(index, 1);
+                updateResourceList();
+            }
+        });
+    </script>
+</body>
+</html>
