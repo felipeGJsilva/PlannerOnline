@@ -270,7 +270,6 @@
             const closeTaskForm = document.getElementById("closeTaskForm");
             const overlay = document.getElementById("overlay");
 
-            const mainResourceList = document.getElementById("mainResourceList");
             const addResourceBtn = document.getElementById("addResourceBtn");
             const resourceForm = document.getElementById("resourceForm");
             const resourceFormContent = document.getElementById("resourceFormContent");
@@ -318,7 +317,7 @@
                     const taskItem = `
                         <li>
                             <span>${task.title} - ${task.date}</span>
-                            <button class="btn btn-link task-title-btn" onclick="openDescription('${task.desc}')">Descrição</button>
+                            <button class="btn btn-link" onclick="openDescription('${task.desc}')">Descrição</button>
                             <span class="delete-btn" onclick="deleteTask(${index})">×</span>
                         </li>
                     `;
